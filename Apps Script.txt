@@ -1,0 +1,55 @@
+function doPost(e) {
+  if (e.parameter.url && e.parameter.type) {
+    var url = e.parameter.url;
+    var type = e.parameter.type;
+    var firstName = e.parameter.firstName || '';
+    var lastName = e.parameter.lastName || '';
+    var position = e.parameter.position || '';
+    var company = e.parameter.company || '';
+
+    // Spreadsheet holen
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // 🔹 Tabellenblatt abhängig vom Typ auswählen
+    var sheetName = '';
+    if (url.includes('/in/')) {
+      sheetName = 'Profile';
+    } else if (url.includes('/company/')) {
+      sheetName = 'Unternehmen';
+    } else if (url.includes('/school/')) {
+      sheetName = 'Hochschule';
+    } else {
+      sheetName = 'Sonstiges'; // Fallback, falls etwas anderes gespeichert wird
+    }
+
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      // Falls das Blatt noch nicht existiert, erstellen und Überschriften hinzufügen
+      sheet = ss.insertSheet(sheetName);
+      sheet.appendRow(['Datum', 'Typ', 'URL', 'Vorname', 'Nachname', 'Position', 'Unternehmen']);
+    }
+
+    // 🔹 Datensatz eintragen
+    sheet.appendRow([new Date(), type, url, firstName, lastName, position, company]);
+
+    // 🔹 Erfolgsmeldung zurücksenden
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        status: 'success',
+        sheet: sheetName,
+        url: url
+      }))
+      .setMimeType(ContentService.MimeType.JSON)
+      .addHeader("Access-Control-Allow-Origin", "*");
+
+  } else {
+    // 🔹 Fehlermeldung bei unvollständigen Parametern
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        status: 'error',
+        message: 'Fehlende Parameter.'
+      }))
+      .setMimeType(ContentService.MimeType.JSON)
+      .addHeader("Access-Control-Allow-Origin", "*");
+  }
+}
