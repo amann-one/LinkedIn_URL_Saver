@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
               try {
                 const data = JSON.parse(text);
                 if (data.status === 'success') {
-                  statusDiv.textContent = `✅ ${result.type} gespeichert → Tabellenblatt: ${data.sheet}`;
+                  statusDiv.textContent = `✅ ${result.type} gespeichert → Tabellenblatt: ${data.sheet} 📋`; // Added clipboard emoji 📋 at the end
                   saveButton.textContent = 'Gespeichert!';
                   saveButton.style.backgroundColor = '#4CAF50';
                   setTimeout(() => {
